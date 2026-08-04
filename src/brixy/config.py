@@ -38,21 +38,21 @@ def _app_data_dir() -> Path:
 
 @dataclass
 class BrixyConfig:
-    # --- Picovoice / wake word ---
-    picovoice_access_key: str = field(
-        default_factory=lambda: os.environ.get("PICOVOICE_ACCESS_KEY", "")
-    )
-    # Default: built-in keyword "jarvis" (test korar jonno). Custom "brixy" wake
-    # word banate hole Picovoice Console theke .ppn file train kore niye eikhane
-    # path bosao — README.md e full instruction ache.
+    # --- Wake word (openWakeWord — fully offline, no account/API key needed) ---
+    # Bundled pretrained model name (test korar jonno, package er shathei ashe):
+    # alexa_v0.1 | hey_jarvis_v0.1 | hey_mycroft_v0.1 | hey_marvin_v0.1 | timer_v0.1 | weather_v0.1
     wake_word_builtin: str = field(
-        default_factory=lambda: os.environ.get("BRIXY_WAKE_WORD_BUILTIN", "jarvis")
+        default_factory=lambda: os.environ.get("BRIXY_WAKE_WORD_BUILTIN", "hey_jarvis_v0.1")
     )
-    wake_word_ppn_path: str = field(
-        default_factory=lambda: os.environ.get("BRIXY_WAKE_WORD_PPN", "")
+    # Custom trained "Brixy" model (.onnx / .tflite) — Colab notebook diye train
+    # kore niye path dile eta builtin ke override kore dibe. README.md e steps ache.
+    wake_word_model_path: str = field(
+        default_factory=lambda: os.environ.get("BRIXY_WAKE_WORD_MODEL", "")
     )
-    wake_word_sensitivity: float = field(
-        default_factory=lambda: float(os.environ.get("BRIXY_WAKE_SENSITIVITY", "0.6"))
+    # Detection score threshold (0.0-1.0). Beshi hole kom false-positive kintu
+    # kono somoy real wake word miss korte pare, kom hole ulto.
+    wake_word_threshold: float = field(
+        default_factory=lambda: float(os.environ.get("BRIXY_WAKE_THRESHOLD", "0.5"))
     )
 
     # --- Mic ---
@@ -81,13 +81,8 @@ class BrixyConfig:
     def validate(self) -> list[str]:
         """Startup e call kore — je gulo missing shegulo list kore dey (crash na kore)."""
         problems = []
-        if not self.picovoice_access_key:
-            problems.append(
-                "PICOVOICE_ACCESS_KEY missing — .env e set koro "
-                "(console.picovoice.ai theke free key nao)"
-            )
-        if self.wake_word_ppn_path and not Path(self.wake_word_ppn_path).exists():
-            problems.append(f"Custom wake word file paoa jayni: {self.wake_word_ppn_path}")
+        if self.wake_word_model_path and not Path(self.wake_word_model_path).exists():
+            problems.append(f"Custom wake word model file paoa jayni: {self.wake_word_model_path}")
         return problems
 
 

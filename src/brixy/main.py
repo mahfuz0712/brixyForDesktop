@@ -28,17 +28,13 @@ def run() -> None:
     problems = config.validate()
     for p in problems:
         log.error("Config problem: %s", p)
-    if not config.picovoice_access_key:
-        # Access key chara Porcupine kaj korbe na — early exit, kintu tray e
-        # o ekta status thakle bhalo hoto (porer step e add kora jete pare)
-        log.error("PICOVOICE_ACCESS_KEY set na kora porjonto Brixy start hote parbe na.")
         sys.exit(1)
 
     listener = WakeWordListener(on_wake_word=pipeline.handle_wake_word)
     listener.start()
 
     tray = TrayApp(on_exit=lambda: listener.stop())
-
+    tray.run_in_thread()
     def _handle_sigterm(signum, frame):  # noqa: ANN001, ARG001
         log.info("Signal %s received, shutting down", signum)
         listener.stop()
@@ -46,7 +42,7 @@ def run() -> None:
 
     signal.signal(signal.SIGTERM, _handle_sigterm)
 
-    log.info("Brixy started. Wake word: %s", config.wake_word_ppn_path or config.wake_word_builtin)
+    log.info("Brixy started. Wake word: %s", config.wake_word_model_path or config.wake_word_builtin)
     tray.run_blocking()  # blocks main thread until "Exit" clicked
 
 
