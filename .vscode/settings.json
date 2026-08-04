@@ -1,3 +1,8 @@
 {
-  "python.defaultInterpreterPath": "D:/pythonProjects/Machine Learning/Brixy/brixyForDesktop/brixy-desktop/Scripts/python.exe"
+  "python.defaultInterpreterPath": "D:/pythonProjects/Machine Learning/Brixy/brixyForDesktop/.venv/Scripts/python.exe",
+  "python.analysis.extraPaths": [
+    "D:/pythonProjects/Machine Learning/Brixy/brixyForDesktop/src"
+  ],
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "basic"
 }

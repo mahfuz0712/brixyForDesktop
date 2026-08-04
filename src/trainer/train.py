@@ -1,60 +1,10 @@
-#!/usr/bin/env python3
-"""
-Brixy custom wake-word trainer — standalone, single-file version of the
-openWakeWord custom-model Colab notebook, updated for the current
-openWakeWord v0.6.0 pipeline (which generates the Piper TTS prompts
-itself, so there is no separate TTS loop needed).
-
-==========================================================================
-INSTALL (run once, in this project folder):
-==========================================================================
-  uv venv --python 3.11 .venv
-  source .venv/bin/activate        # Windows: .venv\\Scripts\\activate
-
-  # torch 2.5 (CPU build is fine for these sizes)
-  uv pip install "torch==2.5.0" "torchaudio==2.5.0" torchinfo torchmetrics
-  # NVIDIA GPU instead? use:
-  #   uv pip install "torch==2.5.0" "torchaudio==2.5.0" \
-  #     --index-url https://download.pytorch.org/whl/cu121 --extra-index-url https://pypi.org/simple
-
-  # audio + TTS + core
-  uv pip install piper-tts webrtcvad librosa soundfile numpy scipy \
-    requests scikit-learn pyyaml tqdm
-
-  # openwakeword training deps (what train.py/data.py actually import)
-  uv pip install "datasets==2.14.6" huggingface_hub "pronouncing==0.2.0" \
-    "deep-phonemizer==0.0.19" audiomentations torch-audiomentations \
-    speechbrain mutagen acoustics "onnxruntime==1.22.1" "ai-edge-litert==1.4.0"
-
-  # ONNX -> TFLite (Python 3.11-safe route; the old onnx_tf route is dead)
-  uv pip install "onnx==1.19.1" onnxsim onnx2tf onnx_graphsurgeon sng4onnx
-
-  # openwakeword itself, editable, WITHOUT deps (the list above covers them;
-  # --no-deps avoids its broken pins like tensorflow-cpu==2.8.1)
-  git clone --depth 1 https://github.com/dscripka/openWakeWord
-  uv pip install -e ./openWakeWord --no-deps
-
-USAGE:
-  python train.py --all --target-phrase "brix_eee"     # one shot
-  # or staged:
-  python train.py --data --target-phrase "brix_eee"    # ~10-15 min downloads
-  python train.py --config --train --target-phrase "brix_eee"  # 30-60 min CPU
-  python train.py --tflite                             # onnx -> tflite
-
-OUTPUT:
-  my_custom_model/<phrase>.onnx and my_custom_model/<phrase>.tflite
-  Point config.wake_word_model_path at the .onnx and wake_word.py picks it up.
-"""
-
 from __future__ import annotations
-
 import argparse
 import subprocess
 import sys
 import tarfile
+import json
 from pathlib import Path
-
-import yaml
 
 # --------------------------------------------------------------------------
 # Paths / defaults (same layout as the Colab notebook)
@@ -232,7 +182,8 @@ def write_config(target_phrase: str, n_samples: int, steps: int, max_negative_we
         "max_negative_weight": max_negative_weight,
         "target_false_positives_per_hour": 0.2,
     }
-    CONFIG_FILE.write_text(yaml.dump(config), encoding="utf-8")
+    # JSON is a valid YAML subset, so this remains compatible with YAML readers.
+    CONFIG_FILE.write_text(json.dumps(config, indent=2), encoding="utf-8")
     log(f"Config written to {CONFIG_FILE}")
     return CONFIG_FILE
 
@@ -259,7 +210,7 @@ def run_training(config_file: Path) -> None:
 # Stage 4 — ONNX -> TFLite (onnx2tf, Python 3.11-safe)
 # --------------------------------------------------------------------------
 def convert_to_tflite() -> None:
-    model_name = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8"))["model_name"]
+    model_name = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))["model_name"]
     onnx_path = OUTPUT_DIR / f"{model_name}.onnx"
     if not onnx_path.exists():
         raise SystemExit(f"Missing trained model: {onnx_path} — run --train first")
