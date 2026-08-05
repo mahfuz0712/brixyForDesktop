@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "datasets>=5.0.1",
+    "dotenv>=0.9.9",
     "mutagen==1.47.0",
     "numpy>=2.5.1",
     "openwakeword>=0.4.0",

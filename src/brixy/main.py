@@ -1,28 +1,12 @@
-"""
-Brixy entry point.
-
-Startup e ei order e hoy:
-    1. Config validate (missing access key hole clearly log kore, crash kore na app hang na hoye)
-    2. Wake word listener start (background thread, always-on, low CPU)
-    3. Tray icon start (main thread, blocking — Windows er requirement)
-    4. Wake word detect hole -> pipeline.handle_wake_word() call hoy
-
-Ei module tai hobe PyInstaller er entry point (--noconsole build e).
-"""
-
 from __future__ import annotations
-
 import signal
 import sys
-
 from brixy import pipeline
 from brixy.config import config
 from brixy.logging_utils import get_logger
 from brixy.tray import TrayApp
 from brixy.wake_word import WakeWordListener
-
 log = get_logger()
-
 
 def run() -> None:
     problems = config.validate()

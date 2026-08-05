@@ -1,13 +1,7 @@
-"""Simple rotating-ish logger. Background service e print() kaje lagbe na
-(console.exe e window thakbe na), tai file e log kora dorkar."""
-
 from __future__ import annotations
-
 import logging
 from logging.handlers import RotatingFileHandler
-
 from brixy.config import config
-
 _LOG = logging.getLogger("brixy")
 
 

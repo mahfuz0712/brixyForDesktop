@@ -1,10 +1,4 @@
-"""
-Mic theke raw PCM frame stream kora — sounddevice wrap kore.
 
-Porcupine er nijer specific frame_length ar sample_rate lage (typically
-16000 Hz, 512 samples/frame). Eই module eta respect kore, extra
-resampling/buffering kono heavy library chara.
-"""
 
 from __future__ import annotations
 

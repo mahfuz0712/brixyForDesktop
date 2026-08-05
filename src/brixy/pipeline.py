@@ -1,19 +1,5 @@
-"""
-Pipeline orchestrator.
-
-Ekhon eta shudhu ekta stub — wake word detect howar por ki hobe shetar
-placeholder. Porer step e eikhane STT capture, LLM function-calling loop,
-ar dispatcher (system control functions) call hobe.
-
-Eভাবে আলাদা module e রাখার কারণ: wake_word.py শুধু "কখন activate করব" জানে,
-pipeline.py জানে "activate হলে কী করব" — dutar concern আলাদা রাখলে পরে
-STT/LLM অংশ change করতে wake word touch করা লাগবে না।
-"""
-
 from __future__ import annotations
-
 import threading
-
 from brixy.logging_utils import get_logger
 
 log = get_logger()

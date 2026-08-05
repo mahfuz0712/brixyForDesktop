@@ -1,11 +1,4 @@
-"""
-Brixy — central configuration.
 
-Sob 'knobs' ekhane. .env file theke load hoy (python-dotenv), so kono secret
-(Picovoice access key, LLM API key) code e hardcode thake na — .env e thake,
-ar .env, git-ignored + exe er pashe thake plaintext (parer step e encrypt
-kora jete pare user-specific machine key diye, but MVP e eta thik ache).
-"""
 
 from __future__ import annotations
 

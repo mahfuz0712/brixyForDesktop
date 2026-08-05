@@ -1,10 +1,4 @@
-"""
-System tray icon — GUI mostly hidden, shudhu tray e ekta icon thakbe.
-Right-click menu diye status dekha ba exit kora jay.
-"""
-
 from __future__ import annotations
-
 import threading
 from collections.abc import Callable
 from typing import TYPE_CHECKING

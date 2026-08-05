@@ -1,37 +1,17 @@
-"""
-Always-on wake word listener — Brixy er 'idle state' engine.
-
-openWakeWord use kore — fully offline, ONNX-based, kono account/API key/network
-call lagena (Picovoice er ulto — signup jhamela nai). Model gulo package er
-shathei bundled thake (pretrained), custom "Brixy" model porer step e Colab
-notebook diye train kore .onnx file hishebe drop-in kora jabe.
-
-Design: (age jemon chilo)
-    - WakeWordListener ekta background thread e run kore
-    - Keyword detect hole ekta callback fire hoy (main thread e handle kora hoy)
-    - stop() call korle cleanly thread ar model resource dutoi free hoy
-"""
-
 from __future__ import annotations
-
 import os
 import threading
 import time
 from collections.abc import Callable
 from typing import cast
-
 import numpy as np
 import openwakeword
 from openwakeword.model import Model
-
 from brixy.audio_utils import MicStream
 from brixy.config import config
 from brixy.logging_utils import get_logger
-
 log = get_logger()
-
 OnWakeWordCallback = Callable[[], None]
-
 # openWakeWord er expected input: 16kHz mono, 80ms (1280 samples) chunk
 SAMPLE_RATE = 16000
 FRAME_LENGTH = 1280
